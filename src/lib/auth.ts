@@ -1,5 +1,4 @@
 // Mock authentication system for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 import { AdminUser, mockAdminCredentials } from '@/types'
 

@@ -1,32 +1,20 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authenticateUser, saveUserToSession } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login, loading, error } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
-    try {
-      const user = await authenticateUser(email, password);
-      if (user) {
-        saveUserToSession(user);
-        router.push("/dashboard");
-      } else {
-        setError("Invalid email or password. Please try again.");
-      }
-    } catch {
-      setError("An error occurred during login. Please try again.");
-    } finally {
-      setLoading(false);
+    const success = await login(email, password);
+    if (success) {
+      router.push("/dashboard");
     }
   };
 

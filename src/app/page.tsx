@@ -1,10 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -12,7 +13,7 @@ export default function Home() {
     } else {
       router.push("/login");
     }
-  }, [router]);
+  }, [router, isAuthenticated]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

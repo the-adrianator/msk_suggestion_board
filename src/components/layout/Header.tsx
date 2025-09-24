@@ -1,14 +1,14 @@
 "use client";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { getCurrentUser, logoutUser } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 export const Header: React.FC = () => {
   const router = useRouter();
-  const currentUser = getCurrentUser();
+  const { currentUser, logout } = useAuth();
 
   const handleLogout = () => {
-    logoutUser();
+    logout();
     router.push("/login");
   };
 

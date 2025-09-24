@@ -1,5 +1,4 @@
 // TypeScript interfaces for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 export interface Employee {
   id: string;

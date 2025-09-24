@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
+import { DataInitializer } from "../DataInitializer";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 
 interface LayoutProps {
@@ -13,6 +14,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-background">
+      <DataInitializer />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex flex-col flex-1 overflow-hidden">
