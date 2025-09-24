@@ -1,5 +1,4 @@
 // Suggestion card component for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 "use client";
 import { useState } from "react";
@@ -16,12 +15,18 @@ interface SuggestionCardProps {
   suggestion: Suggestion;
   employeeName: string;
   onStatusUpdate?: (suggestionId: string, status: Suggestion["status"]) => void;
+  isSelected?: boolean;
+  onSelectionChange?: (suggestionId: string, selected: boolean) => void;
+  onStatusModalOpen?: (suggestion: Suggestion) => void;
 }
 
 export const SuggestionCard: React.FC<SuggestionCardProps> = ({
   suggestion,
   employeeName,
   onStatusUpdate,
+  isSelected = false,
+  onSelectionChange,
+  onStatusModalOpen,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -33,50 +38,61 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({
     { value: "overdue", label: "Overdue" },
   ];
 
-  const handleStatusChange = (newStatus: Suggestion["status"]) => {
-    if (onStatusUpdate) {
-      onStatusUpdate(suggestion.id, newStatus);
-    }
-  };
-
   return (
-    <div className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
+    <div
+      className={`bg-card border rounded-lg p-4 hover:shadow-md transition-all ${
+        isSelected ? "border-primary bg-primary/5" : "border-border"
+      }`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-2">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColour(
-                suggestion.status
-              )}`}
-            >
-              {suggestion.status
-                .replace("_", " ")
-                .replace(/\b\w/g, (l) => l.toUpperCase())}
-            </span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColour(
-                suggestion.type
-              )}`}
-            >
-              {suggestion.type.charAt(0).toUpperCase() +
-                suggestion.type.slice(1)}
-            </span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColour(
-                suggestion.priority
-              )}`}
-            >
-              {suggestion.priority.charAt(0).toUpperCase() +
-                suggestion.priority.slice(1)}
-            </span>
+        <div className="flex items-start space-x-3 flex-1">
+          {/* Selection Checkbox */}
+          {onSelectionChange && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={(e) =>
+                onSelectionChange(suggestion.id, e.target.checked)
+              }
+              className="mt-1 h-4 w-4 text-primary focus:ring-primary border-border rounded"
+            />
+          )}
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-2">
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColour(
+                  suggestion.status
+                )}`}
+              >
+                {suggestion.status
+                  .replace("_", " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColour(
+                  suggestion.type
+                )}`}
+              >
+                {suggestion.type.charAt(0).toUpperCase() +
+                  suggestion.type.slice(1)}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColour(
+                  suggestion.priority
+                )}`}
+              >
+                {suggestion.priority.charAt(0).toUpperCase() +
+                  suggestion.priority.slice(1)}
+              </span>
+            </div>
+            <h3 className="text-sm font-medium text-foreground mb-1">
+              {employeeName}
+            </h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {suggestion.description}
+            </p>
           </div>
-          <h3 className="text-sm font-medium text-foreground mb-1">
-            {employeeName}
-          </h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {suggestion.description}
-          </p>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -90,24 +106,25 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({
         </button>
       </div>
 
-      {/* Status Update Dropdown */}
+      {/* Status Update Section */}
       <div className="mb-3">
-        <label className="block text-xs font-medium text-muted-foreground mb-1">
-          Update Status
-        </label>
-        <select
-          value={suggestion.status}
-          onChange={(e) =>
-            handleStatusChange(e.target.value as Suggestion["status"])
-          }
-          className="w-full px-3 py-1 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground">
+            Current Status:{" "}
+            {
+              statusOptions.find((opt) => opt.value === suggestion.status)
+                ?.label
+            }
+          </span>
+          {onStatusModalOpen && (
+            <button
+              onClick={() => onStatusModalOpen(suggestion)}
+              className="text-xs text-primary hover:text-primary/80 font-medium"
+            >
+              Update Status
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Expanded Details */}

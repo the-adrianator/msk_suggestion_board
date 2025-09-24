@@ -1,10 +1,11 @@
 // Suggestions list component for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 "use client";
 import { useState } from "react";
 import { Suggestion } from "@/types";
 import { SuggestionCard } from "./SuggestionCard";
+import { BulkOperations } from "./BulkOperations";
+import { StatusUpdateModal } from "./StatusUpdateModal";
 import { useSuggestions } from "@/hooks/useSuggestions";
 import { ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 
@@ -23,6 +24,10 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
   const { changeStatus, employees } = useSuggestions();
   const [sortField, setSortField] = useState<SortField>("dateUpdated");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [selectedSuggestions, setSelectedSuggestions] = useState<string[]>([]);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] =
+    useState<Suggestion | null>(null);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -49,6 +54,26 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
   const getEmployeeName = (employeeId: string) => {
     const employee = employees.find((emp) => emp.id === employeeId);
     return employee?.name || "Unknown Employee";
+  };
+
+  const handleSelectionChange = (suggestionId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedSuggestions((prev) => [...prev, suggestionId]);
+    } else {
+      setSelectedSuggestions((prev) =>
+        prev.filter((id) => id !== suggestionId)
+      );
+    }
+  };
+
+  const handleStatusModalOpen = (suggestion: Suggestion) => {
+    setSelectedSuggestion(suggestion);
+    setStatusModalOpen(true);
+  };
+
+  const handleStatusModalClose = () => {
+    setStatusModalOpen(false);
+    setSelectedSuggestion(null);
   };
 
   const handleStatusUpdate = async (
@@ -85,21 +110,30 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Results header */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {suggestions.length} suggestion
-          {suggestions.length !== 1 ? "s" : ""}
-          {searchTerm && ` for "${searchTerm}"`}
-        </div>
+    <>
+      <div className="space-y-4">
+        {/* Bulk Operations */}
+        <BulkOperations
+          selectedSuggestions={selectedSuggestions}
+          onSelectionChange={setSelectedSuggestions}
+          suggestions={suggestions}
+        />
 
-        {/* Sort options */}
-        <div className="flex items-center space-x-2 text-sm">
-          <span className="text-muted-foreground">Sort by:</span>
-          <div className="flex items-center space-x-1">
-            {(["dateUpdated", "priority", "status", "type"] as SortField[]).map(
-              (field) => (
+        {/* Results header */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {suggestions.length} suggestion
+            {suggestions.length !== 1 ? "s" : ""}
+            {searchTerm && ` for "${searchTerm}"`}
+          </div>
+
+          {/* Sort options */}
+          <div className="flex items-center space-x-2 text-sm">
+            <span className="text-muted-foreground">Sort by:</span>
+            <div className="flex items-center space-x-1">
+              {(
+                ["dateUpdated", "priority", "status", "type"] as SortField[]
+              ).map((field) => (
                 <button
                   key={field}
                   onClick={() => handleSort(field)}
@@ -110,23 +144,38 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
                   </span>
                   {getSortIcon(field)}
                 </button>
-              )
-            )}
+              ))}
+            </div>
           </div>
+        </div>
+
+        {/* Suggestions grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          {suggestions.map((suggestion) => (
+            <SuggestionCard
+              key={suggestion.id}
+              suggestion={suggestion}
+              employeeName={getEmployeeName(suggestion.employeeId)}
+              onStatusUpdate={handleStatusUpdate}
+              isSelected={selectedSuggestions.includes(suggestion.id)}
+              onSelectionChange={handleSelectionChange}
+              onStatusModalOpen={handleStatusModalOpen}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Suggestions grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {suggestions.map((suggestion) => (
-          <SuggestionCard
-            key={suggestion.id}
-            suggestion={suggestion}
-            employeeName={getEmployeeName(suggestion.employeeId)}
-            onStatusUpdate={handleStatusUpdate}
-          />
-        ))}
-      </div>
-    </div>
+      {/* Status Update Modal */}
+      <StatusUpdateModal
+        isOpen={statusModalOpen}
+        onClose={handleStatusModalClose}
+        suggestion={selectedSuggestion}
+        employeeName={
+          selectedSuggestion
+            ? getEmployeeName(selectedSuggestion.employeeId)
+            : undefined
+        }
+      />
+    </>
   );
 };

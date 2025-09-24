@@ -1,5 +1,4 @@
 // Suggestions page for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 "use client";
 import { useState, useEffect } from "react";
