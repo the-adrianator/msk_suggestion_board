@@ -6,6 +6,7 @@ import {
   PlusIcon,
   ChartBarIcon,
   CogIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
 interface SidebarProps {
@@ -18,6 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
+    { name: "Suggestions", href: "/suggestions", icon: DocumentTextIcon },
     { name: "Create Suggestion", href: "/suggestions/create", icon: PlusIcon },
     { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
     { name: "Settings", href: "/settings", icon: CogIcon },

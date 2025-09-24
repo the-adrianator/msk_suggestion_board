@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useSuggestions } from "@/hooks/useSuggestions";
 import { getStatusColour, getTypeColour, formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -26,11 +27,19 @@ export default function DashboardPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage MSK health suggestions for your employees
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Manage MSK health suggestions for your employees
+            </p>
+          </div>
+          <Link
+            href="/suggestions"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colours"
+          >
+            View All Suggestions
+          </Link>
         </div>
 
         {/* Statistics cards */}
