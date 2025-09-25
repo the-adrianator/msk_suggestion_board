@@ -1,5 +1,4 @@
 // Confirmation dialog component for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 "use client";
 import { Fragment } from "react";

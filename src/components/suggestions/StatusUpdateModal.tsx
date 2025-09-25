@@ -1,5 +1,4 @@
 // Status update modal component for MSK Suggestion Management Board
-// Following British spelling conventions throughout
 
 "use client";
 import { useState } from "react";
